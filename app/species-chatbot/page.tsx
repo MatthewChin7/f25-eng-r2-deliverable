@@ -17,7 +17,46 @@ export default function SpeciesChatbot() {
   };
 
 const handleSubmit = async () => {
-  // TODO: Implement this function
+  if (!message.trim()) return;
+
+  // Add user message to chat log
+  const userMessage = { role: "user" as const, content: message };
+  setChatLog(prev => [...prev, userMessage]);
+  
+  // Clear input
+  setMessage("");
+  
+  // Show loading state
+  const loadingMessage = { role: "bot" as const, content: "Thinking..." };
+  setChatLog(prev => [...prev, loadingMessage]);
+
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get response');
+    }
+
+    const data = await response.json();
+    
+    // Remove loading message and add bot response
+    setChatLog(prev => {
+      const withoutLoading = prev.slice(0, -1);
+      return [...withoutLoading, { role: "bot" as const, content: data.response }];
+    });
+  } catch (error) {
+    // Remove loading message and add error
+    setChatLog(prev => {
+      const withoutLoading = prev.slice(0, -1);
+      return [...withoutLoading, { role: "bot" as const, content: "Sorry, I'm having trouble connecting. Please try again later." }];
+    });
+  }
 }
 
 return (
@@ -66,6 +105,12 @@ return (
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onInput={handleInput}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
             rows={1}
             placeholder="Ask about a species..."
             className="w-full resize-none overflow-hidden rounded border border-border bg-background p-2 text-sm text-foreground focus:outline-none"
