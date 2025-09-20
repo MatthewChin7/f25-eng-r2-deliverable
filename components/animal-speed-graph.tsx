@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import { useEffect, useRef } from "react";
 
 interface AnimalDatum {
   name: string;
@@ -32,17 +32,12 @@ export default function AnimalSpeedGraph() {
     const innerHeight = height - margin.top - margin.bottom;
 
     // Create SVG
-    const svg = d3
-      .select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height);
+    const svg = d3.select(svgRef.current).attr("width", width).attr("height", height);
 
-    const g = svg
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Load and process data
-    d3.csv("/sample_animals.csv").then((data) => {
+    d3.csv("/Matthew_Chin - Cleaned Animal Data").then((data) => {
       const processedData: AnimalDatum[] = data.map((d) => ({
         name: d.name || "",
         speed: +d.speed || 0,
@@ -117,16 +112,12 @@ export default function AnimalSpeedGraph() {
         .text((d) => d.speed);
 
       // Create legend
-      const legend = g
-        .append("g")
-        .attr("transform", `translate(${innerWidth - 150}, 20)`);
+      const legend = g.append("g").attr("transform", `translate(${innerWidth - 150}, 20)`);
 
       const dietTypes = Object.keys(dietColors) as Array<keyof typeof dietColors>;
 
       dietTypes.forEach((diet, i) => {
-        const legendRow = legend
-          .append("g")
-          .attr("transform", `translate(0, ${i * 20})`);
+        const legendRow = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
 
         legendRow
           .append("rect")
@@ -149,7 +140,7 @@ export default function AnimalSpeedGraph() {
     <div className="w-full">
       <h3 className="mb-4 text-xl font-semibold">Animal Speed vs Diet Visualization</h3>
       <div className="flex justify-center">
-        <svg ref={svgRef} className="border rounded-lg bg-white"></svg>
+        <svg ref={svgRef} className="rounded-lg border bg-white"></svg>
       </div>
     </div>
   );
